@@ -1,0 +1,59 @@
+header p, header a, .drawer li, .drawer a {
+  font-size: 18px !important;
+  color: #7f8fa4 !important;
+  text-decoration: none;
+  font-family: 'Source Sans Pro', sans-serif !important;
+}
+header {
+  background: #fff;
+  width: 100%;
+  border-bottom: 1px solid #f6f6f6;
+  position: relative;
+  box-shadow: none !important;
+}
+@media (max-width: 1200px) {
+  header {
+    position: fixed !important;
+ }
+}
+header + * {
+  padding-top: 65px !important;
+}
+header .wrapper {
+  justify-content: space-between;
+}
+header .wrapper > div {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+header p, header a {
+  margin: 0 10px !important;
+}
+header ul.menu {
+  display: flex;
+}
+@media (max-width: 1200px) {
+  header ul.menu {
+    display: none;
+ }
+}
+header ul.menu li {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  color: #7f8fa4;
+  font-size: 18px !important;
+}
+header ul.menu li:hover {
+  background: none !important;
+}
+header .iconButton {
+  padding: 0;
+}
+.drawer {
+  position: absolute;
+}
+@media (max-width: 600px) {
+  header + * {
+    padding-top: 61px !important;
+ }
+}

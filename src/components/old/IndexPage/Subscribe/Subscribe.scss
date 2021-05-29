@@ -1,0 +1,72 @@
+@import '../../../assets/styles/responsive';
+.subscribe {
+    position: relative;
+    background-color: #fbc100;
+    padding: 90px 30px;
+    text-align: center;
+    font-family: "Source Sans Pro", sans-serif;
+    .title,
+    .subtitle {
+        font-size: 26px;
+        font-weight: 300;
+        line-height: 1.23;
+        color: #0e1522;
+        display: block
+    }
+    .subtitle {
+        @include mobile {
+            display: none;
+        }
+    }
+    form {
+        max-width: 400px;
+        margin: 30px auto 0;
+        @include mobile {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+    input {
+        border: solid 2px #333c4e;
+        background: none;
+        padding: 15px 30px;
+        border-radius: 5px 0 0 5px;
+        outline: 0;
+        height: 60px;
+        line-height: 60px;
+        font-size: 14px !important;
+        width: calc(100% - 130px);
+        @include mobile {
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        &::placeholder {
+            color: #333c4e
+        }
+    }
+    button {
+        width: 130px;
+        background: #333c4e;
+        border-radius: 0 5px 5px 0;
+        border: 0;
+        height: 60px;
+        line-height: 62px;
+        padding: 0 30px;
+        font-weight: 600;
+        color: #fff;
+        outline: 0;
+        margin-left: -5px;
+        cursor: pointer;
+        @include mobile {
+            width: 100%;
+            border-radius: 5px;
+            left: 4px;
+            position: relative;
+        }
+    }
+    .inputHidden {
+        position: absolute;
+        left: -5000px;
+    }
+}
