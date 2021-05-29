@@ -1,8 +1,10 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
+import { Auth } from 'aws-amplify';
 
 class App extends Component {
   constructor(props: any) {
     super(props);
+    Auth.signOut();
     localStorage.removeItem('token');
     window.location.href = '/login';
   }

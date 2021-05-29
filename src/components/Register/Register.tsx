@@ -1,45 +1,48 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-import AuthTabs from '../AuhTabs/AuthTabs';
-import { environment } from '../../common/environment';
-import './register.css';
+import { Auth } from 'aws-amplify';
+import { toast } from 'react-toastify';
 import IndexNav from '../IndexNav/IndexNav';
+import './register.css';
+import AuthTabs from '../AuhTabs/AuthTabs';
 
-class Register extends Component {
+interface IRegisterState {
+  email: string;
+  password: string;
+  confirm: string;
+  [key: string]: string
+}
+class Register extends Component<any, IRegisterState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      id: '',
-      username: '',
+      email: '',
       password: '',
-      image: '',
+      confirm: '',
     };
   }
   handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ [event.target.name]: event.target.value });
+    this.setState({ [event.target.id]: event.target.value });
   };
   register = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const result = await axios({
-      method: 'POST',
-      url: `${environment.host}/register`,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: {
-        email: this.state.email,
-        username: this.state.username,
+    if (this.state.password !== this.state.confirm) {
+      return toast.error('Password does not match confirm password');
+    }
+    try {
+      await Auth.signUp({
+        username: this.state.email,
         password: this.state.password,
-      },
-    });
-    if (result.data.error) {
-      alert(result.data.error);
-    } else {
-      window.location.href = '/login';
+        attributes: {
+          email: this.state.email,
+        }
+      });
+      toast.success('Register successful');
+    } catch (error) {
+      toast.error(`Register failed with error: ${error.message}`);
     }
   };
   render() {
@@ -50,6 +53,8 @@ class Register extends Component {
         alignContent="center"
         direction="column"
       >
+        {/*
+        // @ts-ignore */}
         <IndexNav />
         <h2>Register</h2>
         <Grid item={true}>
@@ -76,7 +81,7 @@ class Register extends Component {
                   fullWidth={true}
                   inputProps={{
                     maxLength: 100,
-                    minLength: 5,
+                    minLength: 8,
                   }}
                   onChange={this.handleChange}
                   required={true}
@@ -91,7 +96,7 @@ class Register extends Component {
                   fullWidth={true}
                   inputProps={{
                     maxLength: 100,
-                    minLength: 5,
+                    minLength: 8,
                   }}
                   onChange={this.handleChange}
                   required={true}

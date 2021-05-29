@@ -1,42 +1,34 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import AuthTabs from '../AuhTabs/AuthTabs';
-import { environment } from '../../common/environment';
-import './login.css';
 import IndexNav from '../IndexNav/IndexNav';
+import { toast } from 'react-toastify';
+import { Auth } from 'aws-amplify';
+import './login.css';
 
-class Login extends Component {
-  constructor(props) {
+class Login extends Component<
+  any,
+  { email: string; password: string; [key: string]: string }
+> {
+  constructor(props: any) {
     super(props);
     this.state = {
       email: '',
       password: '',
     };
   }
-  handleChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
+  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ [event.target.id]: event.target.value });
   };
-  login = async (event) => {
+  login = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const result = await axios({
-      method: 'POST',
-      url: `${environment.host}/login`,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: {
-        email: this.state.email,
-        password: this.state.password,
-      },
-    });
-    if (result.data.error) {
-      alert(result.data.error);
-    } else {
-      localStorage.setItem('token', result.data.user.token);
-      window.location = '/home';
+    try {
+      const login = await Auth.signIn(this.state.email, this.state.password);
+      console.log(login);
+    } catch (error) {
+      toast.error(`Login failed with error: ${error.message}`);
     }
   };
   render() {
@@ -47,6 +39,8 @@ class Login extends Component {
         alignContent="center"
         direction="column"
       >
+        {/*
+        // @ts-ignore */}
         <IndexNav />
         <h2>Login</h2>
         <Grid item={true}>

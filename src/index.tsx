@@ -1,9 +1,9 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import Amplify from "aws-amplify";
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import './index.css';
 import reportWebVitals from './reportWebVitals';
+import './index.css';
 
 import RequireAuth from './components/RequireAuth/RequireAuth';
 import Login from './components/Login/Login';
@@ -12,6 +12,15 @@ import Logout from './components/Logout/Logout';
 import Page404 from './components/Page404/Page404';
 import AppWrapper from './components/AppWrapper/AppWrapper';
 import { configureStore } from './store/configureStore';
+
+Amplify.configure({
+  Auth: {
+    region: 'ap-southeast-2',
+    authenticationFlowType: 'USER_PASSWORD_AUTH',
+    userPoolId: 'ap-southeast-2_mWwitCMAM',
+    userPoolWebClientId: '3dit6n3io4hel1aabo5d609po7',
+  },
+});
 
 const store = configureStore();
 
