@@ -1,0 +1,302 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Pipeline using CodePipeline and CodeBuild for continuous delivery of a single-page application to S3
+Parameters:
+  SiteBucketName:
+    Type: String
+    Description: Name of S3 bucket to host the website
+  Stage:
+    Type: String
+    Description: Stage alias to append to CloudFormation stack and add as CodeBuild variable
+    Default: 'dev'
+  GitHubBranch:
+    Type: String
+    Description: GitHub Branch Name
+    Default: 'develop'
+  GitHubToken:
+    NoEcho: true
+    Type: String
+    Description: Github OAuth2 Token
+  BuildType:
+    Type: String
+    Default: 'LINUX_CONTAINER'
+    Description: Build Container Type
+  BuildComputeType:
+    Type: String
+    Default: 'BUILD_GENERAL1_SMALL'
+    Description: Build Compute Type
+  BuildImage:
+    Type: String
+    Default: 'aws/codebuild/standard:5.0'
+    Description: Build Image
+  CloudFrontID:
+    Type: String
+    Default: 'false'
+    Description: CloudFront Instance ID to Invalidate post build (false to disable)
+  CloudFrontPath:
+    Type: String
+    Default: '*'
+    Description: CloudFront Instance Path to Invalidate post build (* to all)
+Mappings:
+  Configuration:
+    Github:
+      User: davidkevork
+      Repo: cc3-frontend
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'GitHub Configuration'
+        Parameters:
+          - GitHubBranch
+          - GitHubToken
+      - Label:
+          default: 'Build Configuration'
+        Parameters:
+          - BuildType
+          - BuildComputeType
+          - BuildImage
+      - Label:
+          default: 'CloudFront Invalidation'
+        Parameters:
+          - CloudFrontID
+          - CloudFrontPath
+    ParameterLabels:
+      SiteBucketName:
+        default: Name of S3 bucket to host the website
+      Stage:
+        default: Stage alias to append to CloudFormation stack and add as CodeBuild variable
+      GitHubBranch:
+        default: GitHub Branch Name
+      GitHubToken:
+        default: GitHub OAuth2 Token
+      BuildType:
+        default: Build Container Type
+      BuildComputeType:
+        default: Build Compute Type
+      BuildImage:
+        default: Build Image
+      CloudFrontID:
+        default: CloudFront ID (optional)
+      CloudFrontPath:
+        default: CloudFront Path (optional)
+Conditions:
+  CloudFrontInvalidate: !Not [!Equals [!Ref CloudFrontID, false]]
+Resources:
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codebuild.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: '/'
+      Policies:
+      - PolicyName: codebuild-service
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Resource:
+            - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}
+            - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}:*
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          - Effect: Allow
+            Resource:
+            - !Sub arn:aws:s3:::${AWS::StackName}*
+            Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:GetObjectVersion
+          - Effect: Allow
+            Action:
+            - ssm:GetParameters
+            Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CodeBuild/*
+          - Effect: Allow
+            Action: s3:*
+            Resource:
+            - !Sub arn:aws:s3:::${SiteBucketName}
+            - !Sub arn:aws:s3:::${SiteBucketName}/*
+          - Effect: !If [CloudFrontInvalidate, Allow, Deny]
+            Action: cloudfront:CreateInvalidation
+            Resource: '*'
+          Version: '2012-10-17'
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codepipeline.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: '/'
+      Policies:
+      - PolicyName: codepipeline-service
+        PolicyDocument:
+          Statement:
+          - Action:
+            - codebuild:*
+            Resource: '*'
+            Effect: Allow
+          - Action:
+            - s3:GetObject
+            - s3:GetObjectVersion
+            - s3:GetBucketVersioning
+            Resource: '*'
+            Effect: Allow
+          - Action:
+            - s3:PutObject
+            Resource:
+            - arn:aws:s3:::codepipeline*
+            Effect: Allow
+          - Action:
+            - s3:*
+            - cloudformation:*
+            - iam:PassRole
+            Resource: '*'
+            Effect: Allow
+          Version: '2012-10-17'
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      AccessControl: PublicRead
+      BucketName: !Ref SiteBucketName
+      WebsiteConfiguration:
+        IndexDocument: index.html
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Action:
+          - s3:GetObject
+          Effect: Allow
+          Resource: !Sub arn:aws:s3:::${SiteBucketName}/*
+          Principal:
+            AWS: '*'
+      Bucket: !Ref SiteBucket
+  PipelineBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+  CodeBuildDeploySite:
+    Type: AWS::CodeBuild::Project
+    DependsOn: CodeBuildRole
+    Properties:
+      Name: !Sub ${AWS::StackName}
+      Description: Deploy site to S3
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: !Ref BuildType
+        ComputeType: !Ref BuildComputeType
+        Image: !Sub ${BuildImage}
+        EnvironmentVariables:
+          -
+            Name: stage
+            Value: !Sub ${Stage}
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec:
+          !Join
+            - ''
+            - - ''
+              - !Sub |
+                version: 0.2
+                phases:
+                  install:
+                    runtime-versions:
+                      nodejs: 14
+                    commands:
+                      - echo ENV Variables
+                      - env
+                      - echo Installing NPM dependencies
+                      - npm ci
+                      - npm run build
+                  pre_build:
+                    commands:
+                      - echo Print variables
+                      - printenv
+                  build:
+                    commands:
+                      - echo Deploying to S3 bucket
+                      - aws s3 rm --recursive s3://${SiteBucketName}/
+                      - aws s3 cp --recursive ./build s3://${SiteBucketName}/
+              - !Sub
+                - '      - ${CloudFrontCommand}'
+                -
+                  CloudFrontCommand:
+                    !If
+                      - CloudFrontInvalidate
+                      - !Join
+                        - ' && '
+                        - - echo CloudFront Cache Invalidation
+                          - aws configure set preview.cloudfront true
+                          - !Sub aws cloudfront create-invalidation --distribution-id ${CloudFrontID} --paths '/${CloudFrontPath}'
+                      - echo No CloudFront Instance
+              - !Sub |
+
+                artifacts:
+                  type: zip
+                  files:
+                    - '**/*'
+      TimeoutInMinutes: 10
+      EncryptionKey: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/s3
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      Stages:
+      - Name: Source
+        Actions:
+        - InputArtifacts: []
+          Name: Source
+          ActionTypeId:
+            Category: Source
+            Owner: ThirdParty
+            Version: '1'
+            Provider: GitHub
+          OutputArtifacts:
+          - Name: SourceOutput
+          Configuration:
+            Owner: !FindInMap [Configuration, Github, User]
+            Repo: !FindInMap [Configuration, Github, Repo]
+            Branch: !Ref GitHubBranch
+            OAuthToken: !Ref GitHubToken
+          RunOrder: 1
+      - Name: Deploy
+        Actions:
+        - Name: Artifact
+          ActionTypeId:
+            Category: Build
+            Owner: AWS
+            Version: '1'
+            Provider: CodeBuild
+          InputArtifacts:
+          - Name: SourceOutput
+          OutputArtifacts:
+          - Name: DeployOutput
+          Configuration:
+            ProjectName: !Ref CodeBuildDeploySite
+          RunOrder: 1
+      ArtifactStore:
+        Type: S3
+        Location: !Ref PipelineBucket
+Outputs:
+  PipelineUrl:
+    Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${Pipeline}
+    Description: CodePipeline URL
+  SiteUrl:
+    Value: !GetAtt [SiteBucket, WebsiteURL]
+    Description: S3 Website URL
