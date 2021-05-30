@@ -6,6 +6,7 @@ import AuthTabs from '../AuhTabs/AuthTabs';
 import IndexNav from '../IndexNav/IndexNav';
 import { toast } from 'react-toastify';
 import { Auth } from 'aws-amplify';
+import { redirect } from '../../helpers/history';
 import './login.css';
 
 class Login extends Component<
@@ -25,8 +26,8 @@ class Login extends Component<
   login = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const login = await Auth.signIn(this.state.email, this.state.password);
-      console.log(login);
+      await Auth.signIn(this.state.email, this.state.password);
+      redirect('/home');
     } catch (error) {
       toast.error(`Login failed with error: ${error.message}`);
     }

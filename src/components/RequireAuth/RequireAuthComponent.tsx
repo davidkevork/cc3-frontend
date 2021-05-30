@@ -24,9 +24,21 @@ class RequireAuthComponent extends React.Component<
 > {
   constructor(props: any) {
     super(props);
-    const data = getToken();
+    this.state = { authDone: false };
+  }
+  async componentDidMount() {
+    const data = await getToken();
     const authDone = this.props.type === 'public' && data.error !== undefined ? true : false;
-    this.state = { authDone };
+    this.setState({ authDone });
+
+    this.props.auth(this.props.user, this.props.type, (authSuccess: boolean) => {
+      console.log(authSuccess, this.props.type);
+      if (authSuccess) {
+        this.setState({ authDone: true });
+      } else if (this.props.type === 'public') {
+        this.setState({ authDone: true });
+      }
+    });
   }
   public render() {
     return (

@@ -1,12 +1,13 @@
 import { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import { Auth } from 'aws-amplify';
 
 class App extends Component {
   constructor(props: any) {
     super(props);
-    Auth.signOut();
-    localStorage.removeItem('token');
-    window.location.href = '/login';
+    Auth.signOut().then(() => {
+      props.history.push('/');
+    });
   }
   render() {
     return (
@@ -17,4 +18,5 @@ class App extends Component {
   }
 }
 
-export default App;
+// @ts-ignore
+export default withRouter(App);

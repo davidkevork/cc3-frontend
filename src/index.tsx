@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import Amplify from "aws-amplify";
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
+import { configureStore } from './store/configureStore';
 import './index.css';
 
 import RequireAuth from './components/RequireAuth/RequireAuth';
@@ -11,7 +12,7 @@ import Register from './components/Register/Register';
 import Logout from './components/Logout/Logout';
 import Page404 from './components/Page404/Page404';
 import AppWrapper from './components/AppWrapper/AppWrapper';
-import { configureStore } from './store/configureStore';
+import Home from './components/Home/Home';
 
 Amplify.configure({
   Auth: {
@@ -36,7 +37,7 @@ const RegisterRoute = (props: any) => (
 );
 const HomeRoute = (props: any) => (
   <RequireAuth type="private">
-    <Register {...props} />
+    <Home {...props} />
   </RequireAuth>
 );
 

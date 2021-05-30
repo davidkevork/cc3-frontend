@@ -5,15 +5,15 @@ import { publicAuth, privateAuth } from '../../helpers/auth';
 import RequireAuthComponent from './RequireAuthComponent';
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  auth: (
+  auth: async (
     props: any,
     auth: 'private' | 'public' | undefined,
     callback: (success: boolean) => void,
   ) => {
-    return (auth === 'public' ?
-      publicAuth(dispatch, props, callback)
+    return await (auth === 'public' ?
+      await publicAuth(dispatch, props, callback)
       :
-      privateAuth(dispatch, props, callback)
+      await privateAuth(dispatch, props, callback)
     );
   },
 });

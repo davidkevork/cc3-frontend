@@ -1,6 +1,6 @@
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom';
 
 const AuthTabs = (props: any) => {
   const login = () => { props.history.push('/login'); };
