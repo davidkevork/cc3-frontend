@@ -1,0 +1,11 @@
+.add-car {
+  margin: 0 auto;
+  width: 80% !important;
+}
+.text-center {
+  text-align: center;
+}
+.add-car-btn {
+  margin-left: 2px !important;
+  margin-right: 2px !important;
+}

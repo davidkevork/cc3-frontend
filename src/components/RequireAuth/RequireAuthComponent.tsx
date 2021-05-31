@@ -32,7 +32,6 @@ class RequireAuthComponent extends React.Component<
     this.setState({ authDone });
 
     this.props.auth(this.props.user, this.props.type, (authSuccess: boolean) => {
-      console.log(authSuccess, this.props.type);
       if (authSuccess) {
         this.setState({ authDone: true });
       } else if (this.props.type === 'public') {

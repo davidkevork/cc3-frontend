@@ -1,20 +1,27 @@
 import React, { Component } from 'react';
 import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Grid from '@material-ui/core/Grid';
 import HomeNav from '../HomeNav/HomeNav';
 import { carMake, carModel } from '../../constants/carModelList';
-import './Home.css';
+import { IUserReducerState } from '../../reducers/reducer_user';
+import './AddCar.css';
 
-interface IHomeState {
+interface IAddCarState {
   carMake?: string;
   carModel?: string;
   carYear?: number;
   carRego?: string;
 }
 
-class Home extends Component<any, IHomeState> {
-  constructor(props: any) {
+interface IAddCarProps {
+  checkCarRego: (rego?: string) => Promise<void | {}>;
+  user: IUserReducerState;
+}
+
+class AddCar extends Component<IAddCarProps, IAddCarState> {
+  constructor(props: IAddCarProps) {
     super(props);
 
     this.state = {
@@ -23,23 +30,7 @@ class Home extends Component<any, IHomeState> {
       carYear: undefined,
       carRego: undefined,
     };
-  }
-  componentDidMount() {
-    // const options = {
-    //   method: 'GET',
-    //   url: 'https://vicroads-registration-check.p.rapidapi.com/vicroads/YIP348',
-    //   headers: {
-    //     'x-rapidapi-key': '1c118fab90msh2a4f0e3e13a3305p1a7a82jsn94d20379c9a2',
-    //     'x-rapidapi-host': 'vicroads-registration-check.p.rapidapi.com'
-    //   }
-    // };
-    // // @ts-ignore
-    // axios(options).then(function (response) {
-    //   console.log(response.data);
-    // }).catch(function (error) {
-    //   console.error(error);
-    // });
-    // {"registration_number": "YIP348", "registration_status": "Current - 28/04/2022", "vehicle": "2011 BLUE KIA WAGON", "vin_number": "KNAMH817MB6407800", "engine_number": "G6DCAS608018", "registration_seriel_number": "6083288", "compliance_plate_date": "01/2011", "sanction": "None", "goods_carrying_vehicle": "No", "transfer_in_dispute": "No"}
+    console.log(this.props.user);
   }
   private onChangeCarMake = (event: React.ChangeEvent<{}>, value: string) => {
     this.setState({ carMake: value });
@@ -52,13 +43,29 @@ class Home extends Component<any, IHomeState> {
       [event.target.id]: event.target.value,
     });
   };
+  private addCar = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+  private checkCarRego = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    await this.props.checkCarRego(this.state.carRego);
+  };
   render() {
     return (
       <React.Fragment>
         <HomeNav />
-
-        <Grid container={true} direction="row" justify="center" alignItems="center" lg={8} className="add-car">
-          <Grid item={true} lg={10}>
+        <Grid
+          container={true}
+          direction="row"
+          justify="center"
+          alignContent="center"
+          alignItems="center"
+          className="add-car"
+        >
+          <Grid item={true} lg={10} sm={10} xs={10}>
+            <h2 className="text-center">Add Car</h2>
+          </Grid>
+          <Grid item={true} lg={10} sm={10} xs={10}>
             <Autocomplete
               freeSolo={false}
               id="carMake"
@@ -77,7 +84,7 @@ class Home extends Component<any, IHomeState> {
               )}
             />
           </Grid>
-          <Grid item={true} lg={10}>
+          <Grid item={true} lg={10} sm={10} xs={10}>
             {this.state.carMake ? (
               <Autocomplete
                 freeSolo={false}
@@ -101,7 +108,7 @@ class Home extends Component<any, IHomeState> {
               <p>Select a car make to choose the car model</p>
             )}
           </Grid>
-          <Grid item={true} lg={10}>
+          <Grid item={true} lg={10} sm={10} xs={10}>
             <TextField
               id="carYear"
               label="Car Year"
@@ -116,7 +123,7 @@ class Home extends Component<any, IHomeState> {
               required={true}
             />
           </Grid>
-          <Grid item={true} lg={10}>
+          <Grid item={true} lg={10} sm={10} xs={10}>
             <TextField
               id="carRego"
               label="Car Rego"
@@ -131,10 +138,18 @@ class Home extends Component<any, IHomeState> {
               required={true}
             />
           </Grid>
+          <Grid item={true} lg={10} sm={10} xs={10}>
+          <Button variant="contained" color="primary" className="add-car-btn" onClick={this.checkCarRego}>
+              Check Car Rego
+            </Button>
+            <Button variant="contained" color="primary" className="add-car-btn" onClick={this.addCar}>
+              Add Car
+            </Button>
+          </Grid>
         </Grid>
       </React.Fragment>
     );
   }
 }
 
-export default Home;
+export default AddCar;

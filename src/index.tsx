@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import Amplify from "aws-amplify";
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
-import { configureStore } from './store/configureStore';
+import { store } from './store/configureStore';
 import './index.css';
 
 import RequireAuth from './components/RequireAuth/RequireAuth';
@@ -13,6 +13,7 @@ import Logout from './components/Logout/Logout';
 import Page404 from './components/Page404/Page404';
 import AppWrapper from './components/AppWrapper/AppWrapper';
 import Home from './components/Home/Home';
+import AddCar from './components/AddCar/AddCar';
 
 Amplify.configure({
   Auth: {
@@ -22,8 +23,6 @@ Amplify.configure({
     userPoolWebClientId: '3dit6n3io4hel1aabo5d609po7',
   },
 });
-
-const store = configureStore();
 
 const LoginRoute = (props: any) => (
   <RequireAuth type="public">
@@ -40,6 +39,11 @@ const HomeRoute = (props: any) => (
     <Home {...props} />
   </RequireAuth>
 );
+const AddCarRoute = (props: any) => (
+  <RequireAuth type="private">
+    <AddCar {...props} />
+  </RequireAuth>
+);
 
 ReactDOM.render(
   <Provider store={store}>
@@ -50,6 +54,7 @@ ReactDOM.render(
           <Route exact={true} path="/register" component={RegisterRoute} />
           <Route exact={true} path="/home" component={HomeRoute} />
           <Route exact={true} path="/logout" component={Logout} />
+          <Route exact={true} path="/addcar" component={AddCarRoute} />
           <Route component={Page404} />
         </Switch>
       </AppWrapper>

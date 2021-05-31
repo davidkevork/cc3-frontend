@@ -9,3 +9,5 @@ const enhancer = applyMiddleware(
 export const configureStore = (initialState?: any): Store<RootState> => {
   return createStore(rootReducer, initialState, enhancer);
 };
+
+export const store = configureStore();
