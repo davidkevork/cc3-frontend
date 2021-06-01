@@ -6,17 +6,25 @@ import Grid from '@material-ui/core/Grid';
 import HomeNav from '../HomeNav/HomeNav';
 import { carMake, carModel } from '../../constants/carModelList';
 import { IUserReducerState } from '../../reducers/reducer_user';
+import { JsonObject } from '../../typings';
 import './AddCar.css';
 
 interface IAddCarState {
   carMake?: string;
   carModel?: string;
-  carYear?: number;
+  carYear?: string;
   carRego?: string;
+  carRegoDetails?: JsonObject;
 }
 
 interface IAddCarProps {
-  checkCarRego: (rego?: string) => Promise<void | {}>;
+  checkCarRego: (rego?: string) => Promise<JsonObject | undefined>;
+  addCar: (
+    carMake?: string,
+    carModel?: string,
+    carYear?: string,
+    carRego?: string,
+  ) => Promise<JsonObject | undefined>;
   user: IUserReducerState;
 }
 
@@ -29,8 +37,8 @@ class AddCar extends Component<IAddCarProps, IAddCarState> {
       carModel: undefined,
       carYear: undefined,
       carRego: undefined,
+      carRegoDetails: undefined,
     };
-    console.log(this.props.user);
   }
   private onChangeCarMake = (event: React.ChangeEvent<{}>, value: string) => {
     this.setState({ carMake: value });
@@ -43,12 +51,33 @@ class AddCar extends Component<IAddCarProps, IAddCarState> {
       [event.target.id]: event.target.value,
     });
   };
-  private addCar = (event: React.MouseEvent<HTMLButtonElement>) => {
+  private addCar = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    await this.props.addCar(this.state.carMake, this.state.carModel, this.state.carYear, this.state.carRego);
   };
   private checkCarRego = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    await this.props.checkCarRego(this.state.carRego);
+    const regoDetails = await this.props.checkCarRego(this.state.carRego);
+    this.setState({ carRegoDetails: regoDetails });
+  };
+  private showCarRegoDetails = (): JSX.Element => {
+    const details = this.state.carRegoDetails;
+    if (!details) {
+      return <div></div>;
+    }
+
+    return (
+      <div>
+        <p>
+          <b>Car Registration Details</b>
+        </p>
+        {Object.keys(details).map((detail) => (
+          <p key={detail}>
+            {detail}: {details[detail]}
+          </p>
+        ))}
+      </div>
+    );
   };
   render() {
     return (
@@ -139,12 +168,33 @@ class AddCar extends Component<IAddCarProps, IAddCarState> {
             />
           </Grid>
           <Grid item={true} lg={10} sm={10} xs={10}>
-          <Button variant="contained" color="primary" className="add-car-btn" onClick={this.checkCarRego}>
+            <Button
+              variant="contained"
+              color="primary"
+              className="add-car-btn"
+              onClick={this.checkCarRego}
+            >
               Check Car Rego
             </Button>
-            <Button variant="contained" color="primary" className="add-car-btn" onClick={this.addCar}>
+            <Button
+              variant="contained"
+              color="primary"
+              className="add-car-btn"
+              onClick={this.addCar}
+            >
               Add Car
             </Button>
+          </Grid>
+        </Grid>
+
+        <Grid
+          container={true}
+          alignContent="center"
+          justify="center"
+          className="add-car"
+        >
+          <Grid item={true} lg={10} sm={10} xs={10}>
+            {this.showCarRegoDetails()}
           </Grid>
         </Grid>
       </React.Fragment>
