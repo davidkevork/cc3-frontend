@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import HomeNav from '../HomeNav/HomeNav';
 import { carMake, carModel } from '../../constants/carModelList';
 import { IUserReducerState } from '../../reducers/reducer_user';
-import { JsonObject } from '../../typings';
+import { JsonObject } from '../../typings/common';
 import './AddCar.css';
 
 interface IAddCarState {

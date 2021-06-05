@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { RootState } from '../../reducers';
 import AddCarComponent from './AddCarComponent';
 import { toast } from 'react-toastify';
-import { JsonObject } from './../../typings';
+import { JsonObject } from '../../typings/common';
 import axios from 'axios';
 import { store } from './../../store/configureStore';
 

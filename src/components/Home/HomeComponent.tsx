@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { JsonObject } from '../../typings';
+import { JsonObject } from '../../typings/common';
 import HomeNav from '../HomeNav/HomeNav';
 import './Home.css';
 import { IUserReducerState } from '../../reducers/reducer_user';
