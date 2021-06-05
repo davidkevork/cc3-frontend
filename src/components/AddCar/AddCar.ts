@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { RootState } from '../../reducers';
 import AddCarComponent from './AddCarComponent';
 import { toast } from 'react-toastify';
-import { JsonObject } from '../../typings';
+import { JsonObject } from './../../typings';
 import axios from 'axios';
 import { store } from './../../store/configureStore';
 
@@ -16,7 +16,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     try {
       const regoCheck = await axios({
         method: 'GET',
-        url: `https://d3vx0zx22ga42i.cloudfront.net/car/registration/${carRego}`,
+        url: `https://api.cc3-david.com/car/registration/${carRego}`,
         headers: {
           Authorization: `Bearer ${store.getState().user.jwt}`,
           'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     try {
       const response = await axios({
         method: 'POST',
-        url: 'https://d3vx0zx22ga42i.cloudfront.net/car',
+        url: 'https://api.cc3-david.com/car',
         headers: {
           Authorization: `Bearer ${store.getState().user.jwt}`,
           'Content-Type': 'application/json',
