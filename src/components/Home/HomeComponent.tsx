@@ -1,0 +1,84 @@
+import React, { Component } from 'react';
+import axios from 'axios';
+import { JsonObject } from '../../typings';
+import HomeNav from '../HomeNav/HomeNav';
+import './Home.css';
+import { IUserReducerState } from '../../reducers/reducer_user';
+import {
+  Card,
+  CardContent,
+  Container,
+  Grid,
+  Typography,
+} from '@material-ui/core';
+import { NavLink } from 'react-router-dom';
+
+interface IHomeProps {
+  user: IUserReducerState;
+}
+
+interface IHomeState {
+  carData: Array<JsonObject>;
+}
+
+class HomeComponent extends Component<IHomeProps, IHomeState> {
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      carData: [],
+    };
+  }
+  async componentDidMount() {
+    try {
+      const response = await axios({
+        method: 'GET',
+        url: 'https://api.cc3-david.com/car',
+        headers: {
+          Authorization: `Bearer ${this.props.user.jwt}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      this.setState({
+        carData: response.data,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  private listCars = () => {
+    return this.state.carData.map((carData) => (
+      <Grid item={true}>
+        <Card>
+          <CardContent>
+            <Typography variant="body1">Car make: {carData.carMake}</Typography>
+            <Typography variant="body1">
+              Car model: {carData.carModel}
+            </Typography>
+            <Typography variant="body1">Car year: {carData.carYear}</Typography>
+            <Typography variant="body1">Car rego: {carData.carRego}</Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+    ));
+  };
+  render() {
+    return (
+      <React.Fragment>
+        <HomeNav />
+        <Container maxWidth="lg">
+          <Grid container={true} justify="flex-end">
+            <Typography variant="body1">
+              Click <NavLink to="/addcar">here</NavLink> to add cars
+            </Typography>
+          </Grid>
+          <Grid container={true} className="car-list" justify="center" spacing={2}>
+            {this.listCars()}
+          </Grid>
+        </Container>
+      </React.Fragment>
+    );
+  }
+}
+
+export default HomeComponent;

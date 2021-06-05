@@ -40,9 +40,18 @@ class HomeNav extends React.Component<{}, IHomeNavState> {
   public menuLinks = () => {
     const open = Boolean(this.state.anchorEl);
     const redirectLogout = () => redirect('/logout');
+    const redirectHome = () => redirect('/home');
     return (
       <React.Fragment>
         <MenuList className="menu">
+          <MenuItem
+            className="account-menu-item"
+            disableRipple={true}
+            disableTouchRipple={true}
+            onClick={redirectHome}
+          >
+            Home
+          </MenuItem>
           <MenuItem
             className="account-menu-item logout"
             disableRipple={true}
@@ -82,6 +91,14 @@ class HomeNav extends React.Component<{}, IHomeNavState> {
           onClose={this.handleClose}
           className="account-menu"
         >
+          <MenuItem
+            className="account-menu-item"
+            disableRipple={true}
+            disableTouchRipple={true}
+            onClick={redirectHome}
+          >
+            Home
+          </MenuItem>
           <MenuItem
             className="logout"
             disableRipple={true}
