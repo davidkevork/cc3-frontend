@@ -7,6 +7,7 @@ import { IUserReducerState } from '../../reducers/reducer_user';
 import { Container, Grid, Typography } from '@material-ui/core';
 import { NavLink } from 'react-router-dom';
 import Car from '../Car/Car';
+import { API_URL } from '../../constants/const';
 
 interface IHomeProps {
   deleteCar: (carId: string) => Promise<void>;
@@ -33,7 +34,7 @@ class HomeComponent extends Component<IHomeProps, IHomeState> {
     try {
       const response = await axios({
         method: 'GET',
-        url: 'https://api.cc3-david.com/car',
+        url: `${API_URL}/car`,
         headers: {
           Authorization: `Bearer ${this.props.user.jwt}`,
           'Content-Type': 'application/json',

@@ -14,6 +14,8 @@ import Page404 from './components/Page404/Page404';
 import AppWrapper from './components/AppWrapper/AppWrapper';
 import Home from './components/Home/Home';
 import AddCar from './components/AddCar/AddCar';
+import QuickSight from './components/QuickSight/QuickSight';
+import Index from './components/Index/Index';
 
 Amplify.configure({
   Auth: {
@@ -24,6 +26,11 @@ Amplify.configure({
   },
 });
 
+const IndexRoute = (props: any) => (
+  <RequireAuth type="public">
+    <Index {...props} />
+  </RequireAuth>
+);
 const LoginRoute = (props: any) => (
   <RequireAuth type="public">
     <Login {...props} />
@@ -44,17 +51,24 @@ const AddCarRoute = (props: any) => (
     <AddCar {...props} />
   </RequireAuth>
 );
+const AnalysisRoute = (props: any) => (
+  <RequireAuth type="private">
+    <QuickSight {...props} />
+  </RequireAuth>
+);
 
 ReactDOM.render(
   <Provider store={store}>
     <Router>
       <AppWrapper>
         <Switch>
+          <Route exact={true} path="/" component={IndexRoute} />
           <Route exact={true} path="/login" component={LoginRoute} />
           <Route exact={true} path="/register" component={RegisterRoute} />
           <Route exact={true} path="/home" component={HomeRoute} />
-          <Route exact={true} path="/logout" component={Logout} />
           <Route exact={true} path="/addcar" component={AddCarRoute} />
+          <Route exact={true} path="/analysis" component={AnalysisRoute} />
+          <Route exact={true} path="/logout" component={Logout} />
           <Route component={Page404} />
         </Switch>
       </AppWrapper>

@@ -39,6 +39,7 @@ class HomeNav extends React.Component<{}, IHomeNavState> {
   };
   public menuLinks = () => {
     const open = Boolean(this.state.anchorEl);
+    const redirectAnalysis = () => redirect('/analysis');
     const redirectLogout = () => redirect('/logout');
     const redirectHome = () => redirect('/home');
     return (
@@ -51,6 +52,14 @@ class HomeNav extends React.Component<{}, IHomeNavState> {
             onClick={redirectHome}
           >
             Home
+          </MenuItem>
+          <MenuItem
+            className="account-menu-item"
+            disableRipple={true}
+            disableTouchRipple={true}
+            onClick={redirectAnalysis}
+          >
+            Analysis
           </MenuItem>
           <MenuItem
             className="account-menu-item logout"
@@ -98,6 +107,14 @@ class HomeNav extends React.Component<{}, IHomeNavState> {
             onClick={redirectHome}
           >
             Home
+          </MenuItem>
+          <MenuItem
+            className="account-menu-item"
+            disableRipple={true}
+            disableTouchRipple={true}
+            onClick={redirectAnalysis}
+          >
+            Analysis
           </MenuItem>
           <MenuItem
             className="logout"

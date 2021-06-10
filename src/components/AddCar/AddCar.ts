@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { JsonObject } from '../../typings/common';
 import axios from 'axios';
 import { store } from './../../store/configureStore';
+import { API_URL } from '../../constants/const';
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   checkCarRego: async (carRego?: string): Promise<JsonObject | undefined> => {
@@ -16,7 +17,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     try {
       const regoCheck = await axios({
         method: 'GET',
-        url: `https://api.cc3-david.com/car/registration/${carRego}`,
+        url: `${API_URL}/car/registration/${carRego}`,
         headers: {
           Authorization: `Bearer ${store.getState().user.jwt}`,
           'Content-Type': 'application/json',
@@ -48,7 +49,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     try {
       const response = await axios({
         method: 'POST',
-        url: 'https://api.cc3-david.com/car',
+        url: `${API_URL}/car`,
         headers: {
           Authorization: `Bearer ${store.getState().user.jwt}`,
           'Content-Type': 'application/json',

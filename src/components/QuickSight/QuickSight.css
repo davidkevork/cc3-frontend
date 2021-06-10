@@ -1,0 +1,8 @@
+.quicksight-iframe {
+  width: 100%;
+  height: calc(100% - 40px) !important;
+}
+.quicksight-container {
+  margin-top: 60px;
+  height: calc(100vh - 80px);
+}
