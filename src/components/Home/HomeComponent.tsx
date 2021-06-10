@@ -4,16 +4,13 @@ import { JsonObject } from '../../typings/common';
 import HomeNav from '../HomeNav/HomeNav';
 import './Home.css';
 import { IUserReducerState } from '../../reducers/reducer_user';
-import {
-  Card,
-  CardContent,
-  Container,
-  Grid,
-  Typography,
-} from '@material-ui/core';
+import { Container, Grid, Typography } from '@material-ui/core';
 import { NavLink } from 'react-router-dom';
+import Car from '../Car/Car';
 
 interface IHomeProps {
+  deleteCar: (carId: string) => Promise<void>;
+  buyCarInsurance: (carId: string) => Promise<void>;
   user: IUserReducerState;
 }
 
@@ -30,6 +27,9 @@ class HomeComponent extends Component<IHomeProps, IHomeState> {
     };
   }
   async componentDidMount() {
+    await this.fetchCars();
+  }
+  private fetchCars = async (): Promise<void> => {
     try {
       const response = await axios({
         method: 'GET',
@@ -45,21 +45,16 @@ class HomeComponent extends Component<IHomeProps, IHomeState> {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   private listCars = () => {
     return this.state.carData.map((carData) => (
-      <Grid item={true}>
-        <Card>
-          <CardContent>
-            <Typography variant="body1">Car make: {carData.carMake}</Typography>
-            <Typography variant="body1">
-              Car model: {carData.carModel}
-            </Typography>
-            <Typography variant="body1">Car year: {carData.carYear}</Typography>
-            <Typography variant="body1">Car rego: {carData.carRego}</Typography>
-          </CardContent>
-        </Card>
-      </Grid>
+      <Car
+        carData={carData}
+        key={carData.id}
+        deleteCar={this.props.deleteCar}
+        buyCarInsurance={this.props.buyCarInsurance}
+        fetchCars={this.fetchCars}
+      />
     ));
   };
   render() {
@@ -72,7 +67,12 @@ class HomeComponent extends Component<IHomeProps, IHomeState> {
               Click <NavLink to="/addcar">here</NavLink> to add cars
             </Typography>
           </Grid>
-          <Grid container={true} className="car-list" justify="center" spacing={2}>
+          <Grid
+            container={true}
+            className="car-list"
+            justify="center"
+            spacing={2}
+          >
             {this.listCars()}
           </Grid>
         </Container>
